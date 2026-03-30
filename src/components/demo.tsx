@@ -2,7 +2,7 @@ import { SignInPage } from "@/components/ui/LandingPage";
 
 const DemoOne = () => {
   return (
-    <div className="flex w-full h-screen justify-center items-center bg-black">
+    <div className="w-full min-h-screen bg-black">
       <SignInPage />
     </div>
   );

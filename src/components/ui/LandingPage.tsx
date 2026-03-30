@@ -348,20 +348,20 @@ function MiniNavbar() {
   ];
 
   return (
-    <header dir="rtl" className={`fixed top-6 left-1/2 transform -translate-x-1/2 z-50 flex flex-col items-center px-4 sm:px-6 py-2.5 backdrop-blur-xl ${headerShapeClass} border border-white/10 bg-black/40 w-[calc(100%-2rem)] sm:w-auto transition-all duration-500 ease-in-out shadow-[0_8px_32px_rgba(0,0,0,0.5)]`}>
-      <div className="flex items-center justify-between w-full gap-x-8 sm:gap-x-12">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-cyan-500 to-white flex items-center justify-center p-1.5 shadow-[0_0_15px_rgba(34,211,238,0.3)]">
-             <div className="w-full h-full rounded-full bg-black flex items-center justify-center text-[10px] font-bold text-white">M</div>
+    <header dir="rtl" className={`fixed top-4 sm:top-6 left-1/2 transform -translate-x-1/2 z-50 flex flex-col items-center px-4 sm:px-6 py-2.5 backdrop-blur-xl ${headerShapeClass} border border-white/10 bg-black/40 w-[92%] sm:w-auto transition-all duration-500 ease-in-out shadow-[0_8px_32px_rgba(0,0,0,0.5)]`}>
+      <div className="flex items-center justify-between w-full gap-x-4 sm:gap-x-12">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-cyan-500 to-white flex items-center justify-center p-1.5 shadow-[0_0_15px_rgba(34,211,238,0.3)] shrink-0">
+            <div className="w-full h-full rounded-full bg-black flex items-center justify-center text-[10px] font-bold text-white">M</div>
           </div>
-          <span className="text-white font-bold tracking-tight hidden sm:block">Mavro Design</span>
+          <span className="text-white font-bold tracking-tight hidden lg:block">Mavro Design</span>
         </div>
-        
+
         <nav className="hidden md:flex items-center space-x-reverse space-x-8 text-sm font-medium">
           {navLinksData.map((link, i) => <AnimatedNavLink key={i} href={link.href}>{link.label}</AnimatedNavLink>)}
         </nav>
 
-        <div className="hidden sm:flex items-center gap-4">
+        <div className="hidden lg:flex items-center gap-4">
           <GlowButton label="ابدأ الآن" className="px-6 py-2 text-xs h-9" icon={ArrowLeft} />
         </div>
 
@@ -376,7 +376,7 @@ function MiniNavbar() {
 
       <AnimatePresence>
         {isOpen && (
-          <motion.div 
+          <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -384,12 +384,12 @@ function MiniNavbar() {
           >
             <nav className="flex flex-col items-center space-y-5 py-6 text-lg font-medium">
               {navLinksData.map((link, i) => (
-                <motion.a 
-                  key={i} 
+                <motion.a
+                  key={i}
                   initial={{ x: 20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: i * 0.1 }}
-                  href={link.href} 
+                  href={link.href}
                   className="text-gray-300 hover:text-white transition-colors"
                 >
                   {link.label}
@@ -405,26 +405,26 @@ function MiniNavbar() {
 }
 
 const FloatingBadge = ({ text, icon: Icon, imageUrl, className, delay = 0, yOffset = 15 }: { text: string, icon?: any, imageUrl?: string, className: string, delay?: number, yOffset?: number }) => (
-  <motion.div 
+  <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: [0, -yOffset, 0] }}
-    transition={{ 
+    transition={{
       opacity: { duration: 1, delay },
       y: { duration: 4, repeat: Infinity, ease: 'easeInOut', delay }
     }}
     className={cn(
-      "absolute flex items-center gap-3 px-4 py-2.5 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-md shadow-[0_0_20px_rgba(0,0,0,0.3)] z-10",
+      "absolute flex items-center gap-2 sm:gap-3 px-3 py-2 sm:px-4 sm:py-2.5 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-md shadow-[0_0_20px_rgba(0,0,0,0.3)] z-10 origin-center scale-[0.8] sm:scale-90 lg:scale-100",
       className
     )}
   >
-    <div className="w-9 h-9 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex flex-shrink-0 items-center justify-center overflow-hidden drop-shadow-lg">
-       {imageUrl ? (
-         <img src={imageUrl} alt={text} className="w-6 h-6 object-contain" />
-       ) : (
-         Icon && <Icon size={14} className="text-cyan-400" />
-       )}
+    <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex flex-shrink-0 items-center justify-center overflow-hidden drop-shadow-lg">
+      {imageUrl ? (
+        <img src={imageUrl} alt={text} className="w-5 h-5 sm:w-6 sm:h-6 object-contain" />
+      ) : (
+        Icon && <Icon size={14} className="text-cyan-400" />
+      )}
     </div>
-    <span className="text-xs sm:text-sm font-semibold text-white/90">{text}</span>
+    <span className="text-[11px] sm:text-sm font-semibold text-white/90 whitespace-nowrap">{text}</span>
   </motion.div>
 );
 
@@ -441,70 +441,70 @@ const VisualElement = () => {
         transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
         className="absolute w-[300px] h-[300px] bg-cyan-500/20 rounded-full blur-[80px]"
       />
-      
+
       {/* The "NFC Card" Mockup */}
       <motion.div
         initial={{ rotateY: 20, rotateX: 10, y: 20, opacity: 0 }}
-        animate={{ 
-          rotateY: [20, 30, 20], 
+        animate={{
+          rotateY: [20, 30, 20],
           rotateX: [10, 5, 10],
           y: [0, -15, 0],
           opacity: 1
         }}
-        transition={{ 
-          duration: 6, 
-          repeat: Infinity, 
+        transition={{
+          duration: 6,
+          repeat: Infinity,
           ease: "easeInOut",
           opacity: { duration: 1 }
         }}
         style={{ transformStyle: "preserve-3d" }}
-        className="relative w-56 h-80 bg-gradient-to-br from-white/10 to-white/5 border border-white/20 rounded-2xl backdrop-blur-md shadow-2xl flex flex-col p-6 items-center justify-between"
+        className="relative w-48 h-72 sm:w-56 sm:h-80 bg-gradient-to-br from-white/10 to-white/5 border border-white/20 rounded-2xl backdrop-blur-md shadow-2xl flex flex-col p-6 items-center justify-between"
       >
         <div className="w-full flex justify-between items-start">
-           <div className="w-10 h-10 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center">
-              <Cpu size={20} className="text-cyan-400" />
-           </div>
-           <div className="text-[10px] text-white/40 font-mono tracking-widest uppercase">NFC TECHNOLOGY</div>
+          <div className="w-10 h-10 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center">
+            <Cpu size={20} className="text-cyan-400" />
+          </div>
+          <div className="text-[10px] text-white/40 font-mono tracking-widest uppercase">NFC TECHNOLOGY</div>
         </div>
-        
+
         <div className="relative w-full flex flex-col items-center">
-            <div className="w-16 h-16 rounded-full bg-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.5)] mb-4 flex items-center justify-center overflow-hidden">
-                 <div className="w-full h-full bg-black/20 flex items-center justify-center text-white font-bold text-xl">M</div>
-            </div>
-            <div className="h-2 w-24 bg-white/20 rounded-full mb-2" />
-            <div className="h-2 w-16 bg-white/10 rounded-full" />
+          <div className="w-16 h-16 rounded-full bg-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.5)] mb-4 flex items-center justify-center overflow-hidden">
+            <div className="w-full h-full bg-black/20 flex items-center justify-center text-white font-bold text-xl">M</div>
+          </div>
+          <div className="h-2 w-24 bg-white/20 rounded-full mb-2" />
+          <div className="h-2 w-16 bg-white/10 rounded-full" />
         </div>
 
         <div className="w-full space-y-3">
           <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-             <motion.div animate={{ x: ['-100%', '100%'] }} transition={{ duration: 3, repeat: Infinity, ease: 'linear' }} className="w-1/2 h-full bg-cyan-400" />
+            <motion.div animate={{ x: ['-100%', '100%'] }} transition={{ duration: 3, repeat: Infinity, ease: 'linear' }} className="w-1/2 h-full bg-cyan-400" />
           </div>
           <div className="flex justify-between items-end">
             <div className="space-y-1">
-               <div className="h-1.5 w-12 bg-white/20 rounded-full" />
-               <div className="h-1.5 w-8 bg-white/10 rounded-full" />
+              <div className="h-1.5 w-12 bg-white/20 rounded-full" />
+              <div className="h-1.5 w-8 bg-white/10 rounded-full" />
             </div>
             <div className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center">
-               <Globe size={14} className="text-white/40" />
+              <Globe size={14} className="text-white/40" />
             </div>
           </div>
         </div>
       </motion.div>
 
       {/* Floating Badges */}
-      <FloatingBadge 
-        text="تقنية NFC ذكية" 
+      <FloatingBadge
+        text="تقنية NFC ذكية"
         imageUrl="https://img.icons8.com/color/48/nfc-n.png"
-        className="top-10 -right-4 lg:-right-16" 
-        delay={0.5} 
+        className="top-0 right-0 sm:top-10 sm:-right-4 lg:-right-16"
+        delay={0.5}
       />
-      
-      <FloatingBadge 
-        text="هوية بصرية احترافية" 
+
+      <FloatingBadge
+        text="هوية بصرية احترافية"
         imageUrl="https://img.icons8.com/3d-fluency/94/color-palette.png"
-        className="bottom-16 -left-4 lg:-left-12" 
-        delay={1.5} 
-        yOffset={-15} 
+        className="bottom-6 left-0 sm:bottom-16 sm:-left-4 lg:-left-12"
+        delay={1.5}
+        yOffset={-15}
       />
     </div>
   );
@@ -519,7 +519,7 @@ const TrustPoint = ({ icon: Icon, text }: { icon: any, text: string }) => (
 
 export const SignInPage = ({ className }: { className?: string }) => {
   return (
-    <div className={cn("flex w-full flex-col min-h-screen bg-[#020617] relative overflow-hidden", className)} dir="rtl">
+    <div className={cn("flex w-full flex-col min-h-[100svh] bg-[#020617] relative overflow-x-hidden", className)} dir="rtl">
       {/* Dynamic Background */}
       <div className="absolute inset-0 z-0">
         <div
@@ -529,98 +529,98 @@ export const SignInPage = ({ className }: { className?: string }) => {
                               radial-gradient(circle 600px at 110% 80%, rgba(34,211,238,0.15), transparent)`,
           }}
         />
-        <div className="absolute inset-0 opacity-20">
+        <div className="absolute inset-0 opacity-20 pointer-events-none">
           <CanvasRevealEffect animationSpeed={2} containerClassName="bg-transparent" colors={[[34, 211, 238]]} dotSize={3} reverse={false} />
         </div>
       </div>
 
       <MiniNavbar />
 
-      <main className="relative z-10 flex flex-1 items-center justify-center pt-20">
-        <div className="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          
+      <main className="relative z-10 flex flex-1 items-start md:items-center justify-center min-h-[100svh] pt-24 sm:pt-40 md:pt-20 lg:pt-0 pb-10">
+        <div className="container mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16 items-start md:items-center w-full">
+
           {/* Content Column */}
-          <motion.div 
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 1, ease: "easeOut" }}
-            className="flex flex-col items-center lg:items-start text-center lg:text-right space-y-10"
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="flex flex-col items-center md:items-start text-center md:text-right space-y-8 sm:space-y-10 md:mt-0"
           >
             <div className="space-y-6">
-               <motion.div 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold"
-                >
-                  <Sparkles size={14} />
-                  <span>حلول بصرية مبتكرة</span>
-                </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold"
+              >
+                <Sparkles size={14} />
+                <span>حلول بصرية مبتكرة</span>
+              </motion.div>
 
-                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[4.5rem] font-bold leading-[1.3] lg:leading-[1.2]">
-                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-cyan-200 to-white/70 bg-[length:200%_auto] animate-shimmer inline-block drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">
-                      نحوّل هويتك إلى
-                   </span>
-                   <br />
-                   <span className="text-cyan-400 drop-shadow-[0_0_25px_rgba(34,211,238,0.4)]">تجربة بصرية ذكية</span>
-                </h1>
+              <h1 className="text-[2.5rem] leading-[1.2] sm:text-5xl md:text-6xl lg:text-7xl xl:text-[4.5rem] font-bold sm:leading-[1.4] lg:leading-[1.2]">
+                <span className="text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+                  نحوّل هويتك إلى
+                </span>
+                <br />
+                <span className="text-cyan-400 drop-shadow-[0_0_25px_rgba(34,211,238,0.4)]">تجربة بصرية ذكية</span>
+              </h1>
 
-                <p className="max-w-xl text-base sm:text-lg md:text-xl text-white/70 font-medium leading-[1.8] sm:leading-loose">
-                   رواد في صناعة الهويات البصرية القوية والحلول التقنية المتكاملة.
-                   <br className="hidden md:block" />
-                   نجمع بين الإبداع الفني وتقنية NFC لنعزز حضور علامتك التجارية في العالم الرقمي.
-                </p>
+              <p className="max-w-xl text-base sm:text-lg md:text-xl text-white/70 font-medium leading-[1.8] sm:leading-loose px-4 sm:px-0">
+                رواد في صناعة الهويات البصرية القوية والحلول التقنية المتكاملة.
+                <br className="hidden md:block" />
+                نجمع بين الإبداع الفني وتقنية NFC لنعزز حضور علامتك التجارية في العالم الرقمي.
+              </p>
             </div>
 
             <div className="w-full flex flex-col sm:flex-row items-center gap-4 pt-2">
-              <GlowButton 
-                label="ابدأ مشروعك" 
-                className="w-full sm:w-auto min-w-[200px] h-14 text-lg font-bold" 
-                icon={ArrowLeft} 
+              <GlowButton
+                label="ابدأ مشروعك"
+                className="w-full sm:w-auto min-w-[200px] h-14 text-lg font-bold"
+                icon={ArrowLeft}
               />
-              <GlowButton 
-                label="شاهد أعمالنا" 
+              <GlowButton
+                label="شاهد أعمالنا"
                 variant="secondary"
-                className="w-full sm:w-auto min-w-[200px] h-14 text-lg font-bold" 
-                icon={ArrowRight} 
+                className="w-full sm:w-auto min-w-[200px] h-14 text-lg font-bold"
+                icon={ArrowRight}
               />
             </div>
 
             {/* Trust Points */}
-            <div className="flex flex-wrap justify-center lg:justify-start gap-4 pt-4">
-               <TrustPoint icon={Palette} text="هوية بصرية احترافية" />
-               <TrustPoint icon={Cpu} text="حلول NFC ذكية" />
-               <TrustPoint icon={Globe} text="تجربة رقمية متكاملة" />
+            <div className="flex flex-wrap justify-center md:justify-start gap-4 pt-4 w-full px-4 sm:px-0">
+              <TrustPoint icon={Palette} text="هوية بصرية احترافية" />
+              <TrustPoint icon={Cpu} text="حلول NFC ذكية" />
+              <TrustPoint icon={Globe} text="تجربة رقمية متكاملة" />
             </div>
 
             {/* Smaller Social Links */}
-            <div className="flex items-center gap-6 pt-6 border-t border-white/5 w-full justify-center lg:justify-start">
-               <span className="text-xs text-white/40 font-semibold">تواصل معنا:</span>
-               <a href="https://www.instagram.com/mavrodesign1/" target="_blank" className="text-white/40 hover:text-cyan-400 transition-colors">
-                  <Instagram size={20} />
-               </a>
-               <a href="mailto:mavrodesign1@outlook.com" className="text-white/40 hover:text-cyan-400 transition-colors">
-                  <Mail size={20} />
-               </a>
+            <div className="flex items-center gap-6 pt-6 border-t border-white/5 w-full justify-center md:justify-start">
+              <span className="text-xs text-white/40 font-semibold">تواصل معنا:</span>
+              <a href="https://www.instagram.com/mavrodesign1/" target="_blank" className="text-white/40 hover:text-cyan-400 transition-colors">
+                <Instagram size={20} />
+              </a>
+              <a href="mailto:mavrodesign1@outlook.com" className="text-white/40 hover:text-cyan-400 transition-colors">
+                <Mail size={20} />
+              </a>
             </div>
           </motion.div>
 
           {/* Visual Column */}
           <motion.div
-             initial={{ opacity: 0, scale: 0.8 }}
-             animate={{ opacity: 1, scale: 1 }}
-             transition={{ duration: 1.2, ease: "easeOut", delay: 0.2 }}
-             className="relative z-0 mt-8 lg:mt-0"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.2, ease: "easeOut", delay: 0.2 }}
+            className="relative z-0 mt-4 md:mt-0"
           >
-             <VisualElement />
+            <VisualElement />
           </motion.div>
         </div>
       </main>
 
       {/* Floating Bottom Element */}
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2 opacity-20 hidden lg:block">
-         <motion.div animate={{ y: [0, 10, 0] }} transition={{ duration: 2, repeat: Infinity }}>
-            <div className="w-px h-12 bg-gradient-to-b from-cyan-400 to-transparent" />
-         </motion.div>
+        <motion.div animate={{ y: [0, 10, 0] }} transition={{ duration: 2, repeat: Infinity }}>
+          <div className="w-px h-12 bg-gradient-to-b from-cyan-400 to-transparent" />
+        </motion.div>
       </div>
     </div>
   );
