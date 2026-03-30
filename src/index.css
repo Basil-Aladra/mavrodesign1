@@ -46,6 +46,17 @@
     --radius-2xl: calc(var(--radius) * 1.8);
     --radius-3xl: calc(var(--radius) * 2.2);
     --radius-4xl: calc(var(--radius) * 2.6);
+
+    --animate-shimmer: shimmer 3s linear infinite;
+
+    @keyframes shimmer {
+        from {
+            background-position: 200% 0;
+        }
+        to {
+            background-position: -200% 0;
+        }
+    }
 }
 
 :root {
@@ -79,8 +90,11 @@
     --sidebar-primary-foreground: oklch(0.985 0 0);
     --sidebar-accent: oklch(0.97 0 0);
     --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.708 0 0);
+
+    /* Requested Variables */
+    --background-hex: #f3f4f6;
+    --foreground-hex: #1f2937;
 }
 
 .dark {
@@ -113,18 +127,55 @@
     --sidebar-primary-foreground: oklch(0.985 0 0);
     --sidebar-accent: oklch(0.269 0 0);
     --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.556 0 0);
+
+    /* Requested Dark Variables */
+    --background-hex: #1f1f1f;
+    --foreground-hex: #f9fafb;
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    }
+  }
   body {
     @apply bg-background text-foreground;
-    }
+  }
   html {
     @apply font-sans;
-    }
+  }
+}
+
+@layer components {
+  .glow-btn {
+    @apply relative px-8 py-4 rounded-full font-bold text-white transition-all duration-300;
+    @apply bg-gradient-to-br from-cyan-500 to-blue-600;
+    @apply border border-cyan-400/50 backdrop-blur-md;
+    @apply shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:shadow-[0_0_35px_rgba(6,182,212,0.7)];
+    @apply hover:scale-[1.05] active:scale-[0.95];
+    display: inline-block;
+    overflow: hidden;
+  }
+
+  .glow-btn::before {
+    content: '';
+    @apply absolute inset-0 opacity-0 transition-opacity duration-300;
+    @apply bg-gradient-to-r from-transparent via-white/30 to-transparent;
+    background-size: 200% 100%;
+    z-index: 1;
+  }
+
+  .glow-btn:hover::before {
+    @apply opacity-100;
+    animation: glow-shimmer 2s infinite linear;
+  }
+
+  @keyframes glow-shimmer {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+  }
+
+  [data-state="clicked"].glow-btn {
+    @apply shadow-[0_0_50px_rgba(34,211,238,1)] scale-[0.9];
+  }
 }
