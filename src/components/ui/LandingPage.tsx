@@ -3,8 +3,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import { Instagram, Mail, Sparkles, Palette, Cpu, Globe, ArrowLeft, ArrowRight } from "lucide-react";
+import { Instagram, Mail, Sparkles, Palette, Cpu, Globe, ArrowLeft, MessageCircle } from "lucide-react";
 import { GlowButton } from "./glow-button";
+import { ServicesSection } from "./services-section";
+import { ContactSection } from "./contact-section";
 
 
 type Uniforms = {
@@ -316,10 +318,10 @@ const Shader: React.FC<ShaderProps> = ({ source, uniforms, maxFps = 60 }) => {
 
 const AnimatedNavLink = ({ href, children }: { href: string; children: React.ReactNode }) => {
   return (
-    <a href={href} className="group relative inline-block overflow-hidden h-5 flex items-center text-sm">
+    <a href={href} className="group relative inline-block overflow-hidden h-5 text-sm mx-6">
       <div className="flex flex-col transition-transform duration-400 ease-out transform group-hover:translate-y-[-100%]">
-        <span className="text-gray-400 py-1">{children}</span>
-        <span className="text-white py-1">{children}</span>
+        <span className="text-gray-400 py-1 flex items-center justify-center">{children}</span>
+        <span className="text-white py-1 flex items-center justify-center">{children}</span>
       </div>
     </a>
   );
@@ -342,22 +344,19 @@ function MiniNavbar() {
 
   const navLinksData = [
     { label: 'الرئيسية', href: '#' },
-    { label: 'خدماتنا', href: '#' },
-    { label: 'أعمالنا', href: '#' },
-    { label: 'اتصل بنا', href: '#' },
+    { label: 'خدماتنا', href: '#services' },
+    { label: 'اتصل بنا', href: '#contact' },
   ];
 
   return (
     <header dir="rtl" className={`fixed top-4 sm:top-6 left-1/2 transform -translate-x-1/2 z-50 flex flex-col items-center px-4 sm:px-6 py-2.5 backdrop-blur-xl ${headerShapeClass} border border-white/10 bg-black/40 w-[92%] sm:w-auto transition-all duration-500 ease-in-out shadow-[0_8px_32px_rgba(0,0,0,0.5)]`}>
       <div className="flex items-center justify-between w-full gap-x-4 sm:gap-x-12">
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-cyan-500 to-white flex items-center justify-center p-1.5 shadow-[0_0_15px_rgba(34,211,238,0.3)] shrink-0">
-            <div className="w-full h-full rounded-full bg-black flex items-center justify-center text-[10px] font-bold text-white">M</div>
-          </div>
+        <div className="flex items-center gap-3">
+          <img src="/mavrodesign1/logo.png" alt="Mavro Design Logo" className="w-10 h-10 object-contain rounded-xl border border-white/5 shadow-2xl" />
           <span className="text-white font-bold tracking-tight hidden lg:block">Mavro Design</span>
         </div>
 
-        <nav className="hidden md:flex items-center space-x-reverse space-x-8 text-sm font-medium">
+        <nav className="hidden md:flex items-center gap-x-10 text-sm font-medium">
           {navLinksData.map((link, i) => <AnimatedNavLink key={i} href={link.href}>{link.label}</AnimatedNavLink>)}
         </nav>
 
@@ -616,14 +615,15 @@ export const SignInPage = ({ className }: { className?: string }) => {
               <GlowButton
                 label="ابدأ مشروعك"
                 className="w-full sm:w-auto min-w-[200px] h-14 text-lg font-bold group"
-                icon={ArrowLeft}
-                href="https://www.instagram.com/mavrodesign1/"
+                icon={MessageCircle}
+                href="https://wa.me/970599874112"
               />
               <GlowButton
                 label="شاهد أعمالنا"
                 variant="secondary"
                 className="w-full sm:w-auto min-w-[200px] h-14 text-lg font-bold group"
-                icon={ArrowRight}
+                icon={Instagram}
+                href="https://www.instagram.com/mavrodesign1/"
               />
             </div>
 
@@ -634,16 +634,6 @@ export const SignInPage = ({ className }: { className?: string }) => {
               <TrustPoint icon={Globe} text="تجربة رقمية متكاملة" />
             </div>
 
-            {/* Smaller Social Links */}
-            <div className="flex items-center gap-6 pt-6 border-t border-white/5 w-full justify-center md:justify-start">
-              <span className="text-xs text-white/40 font-semibold">تواصل معنا:</span>
-              <a href="https://www.instagram.com/mavrodesign1/" target="_blank" className="text-white/40 hover:text-cyan-400 transition-colors">
-                <Instagram size={20} />
-              </a>
-              <a href="mailto:mavrodesign1@outlook.com" className="text-white/40 hover:text-cyan-400 transition-colors">
-                <Mail size={20} />
-              </a>
-            </div>
           </motion.div>
 
           {/* Visual Column */}
@@ -657,6 +647,10 @@ export const SignInPage = ({ className }: { className?: string }) => {
           </motion.div>
         </div>
       </main>
+
+      <ServicesSection />
+
+      <ContactSection />
 
       {/* Floating Bottom Element */}
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2 opacity-20 hidden lg:block">
