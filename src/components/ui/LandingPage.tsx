@@ -3,10 +3,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import { Instagram, Mail, Sparkles, Palette, Cpu, Globe, ArrowLeft, MessageCircle } from "lucide-react";
+import { Instagram, Sparkles, Palette, Cpu, Globe, MessageCircle } from "lucide-react";
 import { GlowButton } from "./glow-button";
 import { ServicesSection } from "./services-section";
 import { ContactSection } from "./contact-section";
+import { useTranslation } from "react-i18next";
+import { LanguageSwitcher } from "./language-switcher";
+import { LanguageModal } from "./language-modal";
 
 
 type Uniforms = {
@@ -220,11 +223,8 @@ const DotMatrix: React.FC<DotMatrixProps> = ({
 const ShaderMaterial = ({
   source,
   uniforms,
-  maxFps = 60,
 }: {
   source: string;
-  hovered?: boolean;
-  maxFps?: number;
   uniforms: Uniforms;
 }) => {
   const { size } = useThree();
@@ -311,7 +311,7 @@ const ShaderMaterial = ({
 const Shader: React.FC<ShaderProps> = ({ source, uniforms, maxFps = 60 }) => {
   return (
     <Canvas className="absolute inset-0 h-full w-full">
-      <ShaderMaterial source={source} uniforms={uniforms} maxFps={maxFps} />
+      <ShaderMaterial source={source} uniforms={uniforms} />
     </Canvas>
   );
 };
@@ -328,6 +328,8 @@ const AnimatedNavLink = ({ href, children }: { href: string; children: React.Rea
 };
 
 function MiniNavbar() {
+  const { t, i18n } = useTranslation();
+  const dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
   const [isOpen, setIsOpen] = useState(false);
   const [headerShapeClass, setHeaderShapeClass] = useState('rounded-full');
   const shapeTimeoutRef = useRef<number | null>(null);
@@ -343,17 +345,16 @@ function MiniNavbar() {
   }, [isOpen]);
 
   const navLinksData = [
-    { label: 'الرئيسية', href: '#' },
-    { label: 'خدماتنا', href: '#services' },
-    { label: 'اتصل بنا', href: '#contact' },
+    { label: t('nav.home'), href: '#' },
+    { label: t('nav.services'), href: '#services' },
+    { label: t('nav.contact'), href: '#contact' },
   ];
 
   return (
-    <header dir="rtl" className={`fixed top-4 sm:top-6 left-1/2 transform -translate-x-1/2 z-50 flex flex-col items-center px-4 sm:px-6 py-2.5 backdrop-blur-xl ${headerShapeClass} border border-white/10 bg-black/40 w-[92%] sm:w-auto transition-all duration-500 ease-in-out shadow-[0_8px_32px_rgba(0,0,0,0.5)]`}>
+    <header dir={dir} className={`fixed top-4 sm:top-6 left-1/2 transform -translate-x-1/2 z-50 flex flex-col items-center px-4 sm:px-6 py-2.5 backdrop-blur-xl ${headerShapeClass} border border-white/10 bg-black/40 w-[92%] sm:w-auto transition-all duration-500 ease-in-out shadow-[0_8px_32px_rgba(0,0,0,0.5)]`}>
       <div className="flex items-center justify-between w-full gap-x-4 sm:gap-x-12">
-        <div className="flex items-center gap-3">
-          <img src="/mavrodesign1/logo.png" alt="Mavro Design Logo" className="w-10 h-10 object-contain rounded-xl border border-white/5 shadow-2xl" />
-          <span className="text-white font-bold tracking-tight hidden lg:block">Mavro Design</span>
+        <div className="flex items-center">
+          <span className="text-white font-bold tracking-tight text-lg">Mavro Design</span>
         </div>
 
         <nav className="hidden md:flex items-center gap-x-10 text-sm font-medium">
@@ -361,7 +362,7 @@ function MiniNavbar() {
         </nav>
 
         <div className="hidden lg:flex items-center gap-4">
-          <GlowButton label="ابدأ الآن" className="px-6 py-2 text-xs h-9" icon={ArrowLeft} />
+          <LanguageSwitcher />
         </div>
 
         <button className="md:hidden flex items-center justify-center w-8 h-8 text-white focus:outline-none" onClick={() => setIsOpen(!isOpen)}>
@@ -394,7 +395,9 @@ function MiniNavbar() {
                   {link.label}
                 </motion.a>
               ))}
-              <GlowButton label="ابدأ الآن" className="w-full mt-4" icon={ArrowLeft} />
+              <div className="py-2">
+                <LanguageSwitcher />
+              </div>
             </nav>
           </motion.div>
         )}
@@ -403,7 +406,8 @@ function MiniNavbar() {
   );
 }
 
-const FloatingBadge = ({ text, icon: Icon, imageUrl, className, delay = 0, yOffset = 15 }: { text: string, icon?: any, imageUrl?: string, className: string, delay?: number, yOffset?: number }) => (
+const FloatingBadge = ({ text, icon: Icon, imageUrl, className, delay = 0, yOffset = 15 }: { text: string, icon?: any, imageUrl?: string, className: string, delay?: number, yOffset?: number }) => {
+  return (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: [0, -yOffset, 0] }}
@@ -425,9 +429,11 @@ const FloatingBadge = ({ text, icon: Icon, imageUrl, className, delay = 0, yOffs
     </div>
     <span className="text-[11px] sm:text-sm font-semibold text-white/90 whitespace-nowrap">{text}</span>
   </motion.div>
-);
+  );
+};
 
 const VisualElement = () => {
+  const { t } = useTranslation();
   return (
     <div className="relative w-full h-[350px] lg:h-[500px] flex items-center justify-center pointer-events-none">
       {/* Background Animated Orb */}
@@ -492,14 +498,14 @@ const VisualElement = () => {
 
       {/* Floating Badges */}
       <FloatingBadge
-        text="تقنية NFC ذكية"
+        text={t('hero.trust.nfc')}
         imageUrl="https://img.icons8.com/color/48/nfc-n.png"
         className="top-0 right-0 sm:top-10 sm:-right-4 lg:top-8 lg:right-4"
         delay={0.5}
       />
 
       <FloatingBadge
-        text="هوية بصرية"
+        text={t('hero.visualIdentity')}
         imageUrl="https://img.icons8.com/3d-fluency/94/color-palette.png"
         className="bottom-6 left-0 sm:bottom-16 sm:-left-4 lg:bottom-12 lg:left-4"
         delay={1.5}
@@ -508,7 +514,7 @@ const VisualElement = () => {
 
       {/* New Tool Badges */}
       <FloatingBadge
-        text="هوية تجارية"
+        text={t('hero.trust.branding')}
         imageUrl="https://img.icons8.com/color-glass/48/adobe-photoshop.png"
         className="top-12 left-0 sm:top-24 sm:-left-16 lg:top-28 lg:left-8"
         delay={0.8}
@@ -516,7 +522,7 @@ const VisualElement = () => {
       />
 
       <FloatingBadge
-        text="تصميم متكامل"
+        text={t('services.items.branding.title')}
         imageUrl="https://img.icons8.com/color-glass/48/adobe-illustrator.png"
         className="bottom-0 right-0 sm:bottom-12 sm:-right-12 lg:bottom-8 lg:right-8"
         delay={1.2}
@@ -524,7 +530,7 @@ const VisualElement = () => {
       />
 
       <FloatingBadge
-        text="موشن جرافيك"
+        text={t('services.items.motion.title')}
         imageUrl="https://img.icons8.com/fluency/48/adobe-after-effects.png"
         className="-top-8 left-4 sm:top-4 sm:left-24 lg:-top-12 lg:left-32"
         delay={2}
@@ -532,7 +538,7 @@ const VisualElement = () => {
       />
 
       <FloatingBadge
-        text="تحرير فيديو"
+        text={t('services.items.photography.title')}
         imageUrl="https://img.icons8.com/fluency/48/adobe-premiere-pro.png"
         className="bottom-12 right-0 sm:bottom-auto sm:top-1/2 sm:-right-24 lg:top-1/2 lg:right-4"
         delay={1.8}
@@ -540,7 +546,7 @@ const VisualElement = () => {
       />
 
       <FloatingBadge
-        text="واجهات ذكية"
+        text={t('services.items.uiux.title')}
         imageUrl="https://img.icons8.com/external-tal-revivo-color-tal-revivo/24/external-figma-a-better-way-to-design-and-gather-feedback-all-in-one-place-logo-color-tal-revivo.png"
         className="top-[45%] left-2 sm:top-[70%] sm:-left-24 lg:top-[65%] lg:left-4"
         delay={0.3}
@@ -550,16 +556,39 @@ const VisualElement = () => {
   );
 };
 
-const TrustPoint = ({ icon: Icon, text }: { icon: any, text: string }) => (
-  <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/5 backdrop-blur-sm">
-    <Icon size={14} className="text-cyan-400" />
-    <span className="text-[11px] sm:text-xs text-white/70 whitespace-nowrap">{text}</span>
-  </div>
-);
-
-export const SignInPage = ({ className }: { className?: string }) => {
+const TrustPoint = ({ icon: Icon, text }: { icon: any, text: string }) => {
   return (
-    <div className={cn("flex w-full flex-col min-h-[100svh] bg-[#020617] relative overflow-x-hidden", className)} dir="rtl">
+    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/5 backdrop-blur-sm">
+      <Icon size={14} className="text-cyan-400" />
+      <span className="text-[11px] sm:text-xs text-white/70 whitespace-nowrap">{text}</span>
+    </div>
+  );
+};
+
+export const LandingPage = ({ className }: { className?: string }) => {
+  const { t, i18n } = useTranslation();
+  const dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
+  const [showLanguageModal, setShowLanguageModal] = useState(false);
+
+  useEffect(() => {
+    const hasSelected = localStorage.getItem('mavro_language_selected');
+    if (!hasSelected) {
+      setShowLanguageModal(true);
+    }
+  }, []);
+
+  const handleLanguageSelect = (lang: 'ar' | 'en') => {
+    i18n.changeLanguage(lang);
+    localStorage.setItem('mavro_language_selected', 'true');
+    setShowLanguageModal(false);
+  };
+
+  return (
+    <div className={cn("flex w-full flex-col min-h-[100svh] bg-[#020617] relative overflow-x-hidden", className)} dir={dir}>
+      <LanguageModal 
+        isOpen={showLanguageModal} 
+        onSelect={handleLanguageSelect} 
+      />
       {/* Dynamic Background */}
       <div className="absolute inset-0 z-0">
         <div
@@ -584,7 +613,10 @@ export const SignInPage = ({ className }: { className?: string }) => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="flex flex-col items-center md:items-start text-center md:text-right space-y-8 sm:space-y-10 md:mt-0"
+            className={cn(
+              "flex flex-col items-center space-y-8 sm:space-y-10 md:mt-0",
+              dir === 'rtl' ? "md:items-start text-center md:text-right" : "md:items-start text-center md:text-left"
+            )}
           >
             <div className="space-y-6">
               <motion.div
@@ -593,33 +625,33 @@ export const SignInPage = ({ className }: { className?: string }) => {
                 className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold"
               >
                 <Sparkles size={14} />
-                <span>حلول بصرية مبتكرة</span>
+                <span>{t('hero.innovative')}</span>
               </motion.div>
 
               <h1 className="text-[2.5rem] leading-[1.2] sm:text-5xl md:text-6xl lg:text-7xl xl:text-[4.5rem] font-bold sm:leading-[1.4] lg:leading-[1.2]">
                 <span className="text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">
-                  نحوّل هويتك إلى
+                  {t('hero.titleMain')}
                 </span>
                 <br />
-                <span className="text-cyan-400 drop-shadow-[0_0_25px_rgba(34,211,238,0.4)]">تجربة بصرية ذكية</span>
+                <span className="text-cyan-400 drop-shadow-[0_0_25px_rgba(34,211,238,0.4)]">
+                  {t('hero.titleHighlight')}
+                </span>
               </h1>
 
               <p className="max-w-xl text-base sm:text-lg md:text-xl text-white/70 font-medium leading-[1.8] sm:leading-loose px-4 sm:px-0 lg:leading-relaxed">
-                رواد في صناعة الهويات البصرية القوية والحلول التقنية المتكاملة.
-                <br className="hidden lg:block" />
-                نجمع بين الإبداع الفني وتقنية NFC لنعزز حضور علامتك التجارية في العالم الرقمي.
+                {t('hero.description')}
               </p>
             </div>
 
             <div className="w-full flex flex-col sm:flex-row items-center gap-4 pt-2">
               <GlowButton
-                label="ابدأ مشروعك"
+                label={t('hero.buttons.start')}
                 className="w-full sm:w-auto min-w-[200px] h-14 text-lg font-bold group"
                 icon={MessageCircle}
                 href="https://wa.me/970599874112"
               />
               <GlowButton
-                label="شاهد أعمالنا"
+                label={t('hero.buttons.work')}
                 variant="secondary"
                 className="w-full sm:w-auto min-w-[200px] h-14 text-lg font-bold group"
                 icon={Instagram}
@@ -629,9 +661,9 @@ export const SignInPage = ({ className }: { className?: string }) => {
 
             {/* Trust Points */}
             <div className="flex flex-wrap justify-center md:justify-start gap-4 pt-4 w-full px-4 sm:px-0">
-              <TrustPoint icon={Palette} text="هوية بصرية احترافية" />
-              <TrustPoint icon={Cpu} text="حلول NFC ذكية" />
-              <TrustPoint icon={Globe} text="تجربة رقمية متكاملة" />
+              <TrustPoint icon={Palette} text={t('hero.trust.branding')} />
+              <TrustPoint icon={Cpu} text={t('hero.trust.nfc')} />
+              <TrustPoint icon={Globe} text={t('hero.trust.digital')} />
             </div>
 
           </motion.div>

@@ -1,11 +1,9 @@
-import { SignInPage } from "@/components/ui/LandingPage";
+import { LandingPage } from "@/components/ui/LandingPage";
 
-const DemoOne = () => {
+export function DemoOne() {
   return (
-    <div className="w-full min-h-screen bg-black">
-      <SignInPage />
+    <div className="flex flex-col min-h-screen">
+      <LandingPage />
     </div>
   );
-};
-
-export { DemoOne };
+}

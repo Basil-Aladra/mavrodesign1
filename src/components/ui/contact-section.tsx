@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface ContactCardProps {
   title: string;
@@ -13,6 +14,7 @@ interface ContactCardProps {
 }
 
 const ContactCard = ({ title, value, iconUrl, href, delay = 0, className, color }: ContactCardProps) => {
+  const { t } = useTranslation();
   return (
     <motion.a
       href={href}
@@ -47,32 +49,40 @@ const ContactCard = ({ title, value, iconUrl, href, delay = 0, className, color 
       <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
       <p className="text-white/40 text-sm font-medium mb-6">{value}</p>
 
-      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider opacity-60 group-hover:opacity-100 transition-opacity">
-        <span>تواصل الآن</span>
-        <ExternalLink size={12} />
+      <div className={cn(
+        "flex items-center gap-2 text-xs font-bold uppercase tracking-wider transition-all duration-300",
+        color === "cyan" ? "text-cyan-400/80 group-hover:text-cyan-400" : 
+        color === "pink" ? "text-pink-400/80 group-hover:text-pink-400" : 
+        "text-blue-400/80 group-hover:text-blue-400"
+      )}>
+        <span>{t('contact.action')}</span>
+        <ExternalLink size={12} className="transition-transform group-hover:translate-x-1" />
       </div>
     </motion.a>
   );
 };
 
 export const ContactSection = () => {
+  const { t, i18n } = useTranslation();
+  const isRtl = i18n.language === 'ar';
+
   const contacts = [
     {
-      title: "واتساب",
+      title: t('contact.whatsapp'),
       value: "+970 599 874 112",
       iconUrl: "https://img.icons8.com/3d-fluency/94/whatsapp-logo.png",
       href: "https://wa.me/970599874112",
       color: "cyan",
     },
     {
-      title: "انستقرام",
+      title: t('contact.instagram'),
       value: "@mavrodesign1",
       iconUrl: "https://img.icons8.com/3d-fluency/94/instagram-new.png",
       href: "https://www.instagram.com/mavrodesign1/",
       color: "pink",
     },
     {
-      title: "البريد الإلكتروني",
+      title: t('contact.email'),
       value: "mavrodesign1@outlook.com",
       iconUrl: "https://img.icons8.com/color/48/microsoft-outlook-2025.png",
       href: "mailto:mavrodesign1@outlook.com",
@@ -81,7 +91,7 @@ export const ContactSection = () => {
   ];
 
   return (
-    <section id="contact" className="relative py-24 sm:py-32 overflow-hidden bg-[#020617]" dir="rtl">
+    <section id="contact" className="relative py-24 sm:py-32 overflow-hidden bg-[#020617]" dir={isRtl ? "rtl" : "ltr"}>
       {/* Decorative Orbs */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-500/5 rounded-full blur-[120px] pointer-events-none" />
 
@@ -93,7 +103,7 @@ export const ContactSection = () => {
             viewport={{ once: true }}
             className="px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-bold tracking-widest uppercase"
           >
-            دعنا نتحدث
+            {t('contact.badge')}
           </motion.div>
           
           <motion.h2
@@ -102,7 +112,7 @@ export const ContactSection = () => {
             viewport={{ once: true }}
             className="text-3xl sm:text-4xl md:text-5xl font-bold text-white"
           >
-            اتصل <span className="text-cyan-400">بنا</span>
+            {t('contact.title')} <span className="text-cyan-400">{t('contact.highlight')}</span>
           </motion.h2>
 
           <motion.p
@@ -111,7 +121,7 @@ export const ContactSection = () => {
             viewport={{ once: true }}
             className="max-w-xl text-white/50 font-medium"
           >
-            نحن هنا لتحويل رؤيتك إلى حقيقة بصرية ذكية. تواصل معنا عبر أي من القنوات التالية.
+            {t('contact.subtitle')}
           </motion.p>
         </div>
 
@@ -131,12 +141,12 @@ export const ContactSection = () => {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.5 }}
-          className="mt-24 pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4 text-white/20 text-xs font-semibold uppercase tracking-widest"
+          className="mt-24 pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4 text-white/40 text-xs font-semibold uppercase tracking-widest"
         >
-          <span>© 2026 MAVRO DESIGN. ALL RIGHTS RESERVED.</span>
+          <span>{t('contact.footer')}</span>
           <div className="flex gap-6">
-            <a href="#" className="hover:text-cyan-400 transition-colors">سياسة الخصوصية</a>
-            <a href="#" className="hover:text-cyan-400 transition-colors">الشروط والأحكام</a>
+            <a href="#" className="text-white/50 hover:text-cyan-400 transition-colors">{t('contact.privacy')}</a>
+            <a href="#" className="text-white/50 hover:text-cyan-400 transition-colors">{t('contact.terms')}</a>
           </div>
         </motion.div>
       </div>

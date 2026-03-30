@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
-import { 
-} from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface ServiceCardProps {
   title: string;
@@ -46,41 +45,44 @@ const ServiceCard = ({ title, description, iconUrl, delay = 0, className }: Serv
 };
 
 export const ServicesSection = () => {
+  const { t, i18n } = useTranslation();
+  const isRtl = i18n.language === 'ar';
+
   const services = [
     {
-      title: "الهوية البصرية",
-      description: "نبتكر شعارات وهويات بصرية متكاملة تعكس روح علامتك التجارية وتترك انطباعاً لا ينسى لدى عملائك.",
+      title: t('services.items.branding.title'),
+      description: t('services.items.branding.description'),
       iconUrl: "https://img.icons8.com/3d-fluency/94/create-icon.png",
     },
     {
-      title: "تقنية NFC الذكية",
-      description: "نطور بطاقات أعمال وأنظمة ربط ذكية تتيح لك مشاركة بياناتك ومعلوماتك بلمسة واحدة عبر الجوال.",
+      title: t('services.items.nfc.title'),
+      description: t('services.items.nfc.description'),
       iconUrl: "https://img.icons8.com/color/48/nfc-sign.png",
     },
     {
-      title: "الموشن جرافيك",
-      description: "نصنع فيديوهات تحريك احترافية تحول أفكارك المعقدة إلى قصص بصرية جذابة وسهلة الفهم.",
+      title: t('services.items.motion.title'),
+      description: t('services.items.motion.description'),
       iconUrl: "https://img.icons8.com/3d-fluency/94/visual-effects.png",
     },
     {
-      title: "واجهات الـ UI/UX",
-      description: "نصمم واجهات مستخدم عصرية للمواقع والتطبيقات تضمن تجربة استخدام سلسة وممتعة.",
+      title: t('services.items.uiux.title'),
+      description: t('services.items.uiux.description'),
       iconUrl: "https://img.icons8.com/fluency/48/web-design--v1.png",
     },
     {
-      title: "إدارة منصات التواصل",
-      description: "ندير حضورك الرقمي ونبتكر محتوى إبداعياً يعزز التفاعل ويبني قاعدة جماهيرية قوية لعلامتك.",
+      title: t('services.items.social.title'),
+      description: t('services.items.social.description'),
       iconUrl: "https://img.icons8.com/3d-fluency/94/commercial.png",
     },
     {
-      title: "التصوير الفوتوغرافي",
-      description: "نقدم خدمات تصوير احترافية للمنتجات والمشاريع تبرز أدق التفاصيل وتظهر جودة عملك.",
+      title: t('services.items.photography.title'),
+      description: t('services.items.photography.description'),
       iconUrl: "https://img.icons8.com/3d-fluency/94/camera.png",
     },
   ];
 
   return (
-    <section id="services" className="relative py-24 sm:py-32 overflow-hidden bg-[#020617]" dir="rtl">
+    <section id="services" className="relative py-24 sm:py-32 overflow-hidden bg-[#020617]" dir={isRtl ? "rtl" : "ltr"}>
       {/* Background Decorative Elements */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2 pointer-events-none" />
@@ -94,7 +96,7 @@ export const ServicesSection = () => {
             viewport={{ once: true }}
             className="px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-bold tracking-widest uppercase"
           >
-            ماذا نقدم؟
+            {t('services.badge')}
           </motion.div>
           
           <motion.h2
@@ -104,8 +106,8 @@ export const ServicesSection = () => {
             transition={{ delay: 0.1 }}
             className="text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tight"
           >
-            <span className="text-white">خدماتنا</span>{" "}
-            <span className="text-cyan-400 drop-shadow-[0_0_15px_rgba(34,211,238,0.3)]">المتكاملة</span>
+            <span className="text-white">{t('services.title')}</span>{" "}
+            <span className="text-cyan-400 drop-shadow-[0_0_15px_rgba(34,211,238,0.3)]">{t('services.highlight')}</span>
           </motion.h2>
 
           <motion.p
@@ -115,7 +117,7 @@ export const ServicesSection = () => {
             transition={{ delay: 0.2 }}
             className="max-w-2xl text-white/50 text-sm sm:text-base font-medium leading-relaxed"
           >
-            نجمع بين الإبداع الفني والحلول التقنية المتطورة لنقدم لك تجربة بصرية وقمية لا تضاهى، تضع علامتك التجارية في الصدارة.
+            {t('services.subtitle')}
           </motion.p>
         </div>
 
