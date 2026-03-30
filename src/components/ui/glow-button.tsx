@@ -9,10 +9,11 @@ interface ComponentProps {
   type?: "button" | "submit" | "reset";
   href?: string;
   icon?: LucideIcon;
+  variant?: "primary" | "secondary";
 }
 
 export const GlowButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, ComponentProps>(
-  ({ label = "Generate", onClick, className, type = "button", href, icon: Icon = Sparkles }, ref) => {
+  ({ label = "Generate", onClick, className, type = "button", href, icon: Icon = Sparkles, variant = "primary" }, ref) => {
     const [isClicked, setIsClicked] = useState(false);
 
     const handleClick = () => {
@@ -29,7 +30,10 @@ export const GlowButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Comp
     );
 
     const commonProps = {
-      className: cn("glow-btn", className),
+      className: cn(
+        variant === "primary" ? "glow-btn" : "font-bold border border-white/10 hover:border-white/30 bg-white/5 hover:bg-white/10 text-white transition-all duration-300 rounded-full px-6 py-2.5",
+        className
+      ),
       onClick: handleClick,
       "data-state": isClicked ? "clicked" : undefined,
     };

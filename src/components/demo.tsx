@@ -1,4 +1,4 @@
-import { SignInPage } from "@/components/ui/sign-in-flow-1";
+import { SignInPage } from "@/components/ui/LandingPage";
 
 const DemoOne = () => {
   return (

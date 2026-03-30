@@ -1,0 +1,627 @@
+import React, { useState, useMemo, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import * as THREE from "three";
+import { Instagram, Mail, Sparkles, Palette, Cpu, Globe, ArrowLeft, ArrowRight } from "lucide-react";
+import { GlowButton } from "./glow-button";
+
+
+type Uniforms = {
+  [key: string]: {
+    value: number[] | number[][] | number;
+    type: string;
+  };
+};
+
+interface ShaderProps {
+  source: string;
+  uniforms: {
+    [key: string]: {
+      value: number[] | number[][] | number;
+      type: string;
+    };
+  };
+  maxFps?: number;
+}
+
+export const CanvasRevealEffect = ({
+  animationSpeed = 10,
+  opacities = [0.3, 0.3, 0.3, 0.5, 0.5, 0.5, 0.8, 0.8, 0.8, 1],
+  colors = [[0, 255, 255]],
+  containerClassName,
+  dotSize,
+  showGradient = true,
+  reverse = false,
+}: {
+  animationSpeed?: number;
+  opacities?: number[];
+  colors?: number[][];
+  containerClassName?: string;
+  dotSize?: number;
+  showGradient?: boolean;
+  reverse?: boolean;
+}) => {
+  return (
+    <div className={cn("h-full relative w-full", containerClassName)}>
+      <div className="h-full w-full">
+        <DotMatrix
+          colors={colors ?? [[0, 255, 255]]}
+          dotSize={dotSize ?? 3}
+          opacities={
+            opacities ?? [0.3, 0.3, 0.3, 0.5, 0.5, 0.5, 0.8, 0.8, 0.8, 1]
+          }
+          shader={`
+            ${reverse ? 'u_reverse_active' : 'false'}_;
+            animation_speed_factor_${animationSpeed.toFixed(1)}_;
+          `}
+          center={["x", "y"]}
+        />
+      </div>
+      {showGradient && (
+        <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent" />
+      )}
+    </div>
+  );
+};
+
+interface DotMatrixProps {
+  colors?: number[][];
+  opacities?: number[];
+  totalSize?: number;
+  dotSize?: number;
+  shader?: string;
+  center?: ("x" | "y")[];
+}
+
+const DotMatrix: React.FC<DotMatrixProps> = ({
+  colors = [[0, 0, 0]],
+  opacities = [0.04, 0.04, 0.04, 0.04, 0.04, 0.08, 0.08, 0.08, 0.08, 0.14],
+  totalSize = 20,
+  dotSize = 2,
+  shader = "",
+  center = ["x", "y"],
+}) => {
+  const uniforms = React.useMemo(() => {
+    let colorsArray = [
+      colors[0],
+      colors[0],
+      colors[0],
+      colors[0],
+      colors[0],
+      colors[0],
+    ];
+    if (colors.length === 2) {
+      colorsArray = [
+        colors[0],
+        colors[0],
+        colors[0],
+        colors[1],
+        colors[1],
+        colors[1],
+      ];
+    } else if (colors.length === 3) {
+      colorsArray = [
+        colors[0],
+        colors[0],
+        colors[1],
+        colors[1],
+        colors[2],
+        colors[2],
+      ];
+    }
+    return {
+      u_colors: {
+        value: colorsArray.map((color) => [
+          color[0] / 255,
+          color[1] / 255,
+          color[2] / 255,
+        ]),
+        type: "uniform3fv",
+      },
+      u_opacities: {
+        value: opacities,
+        type: "uniform1fv",
+      },
+      u_total_size: {
+        value: totalSize,
+        type: "uniform1f",
+      },
+      u_dot_size: {
+        value: dotSize,
+        type: "uniform1f",
+      },
+      u_reverse: {
+        value: shader.includes("u_reverse_active") ? 1 : 0,
+        type: "uniform1i",
+      },
+    };
+  }, [colors, opacities, totalSize, dotSize, shader]);
+
+  return (
+    <Shader
+      source={`
+        precision mediump float;
+        in vec2 fragCoord;
+
+        uniform float u_time;
+        uniform float u_opacities[10];
+        uniform vec3 u_colors[6];
+        uniform float u_total_size;
+        uniform float u_dot_size;
+        uniform vec2 u_resolution;
+        uniform int u_reverse;
+
+        out vec4 fragColor;
+
+        float PHI = 1.61803398874989484820459;
+        float random(vec2 xy) {
+            return fract(tan(distance(xy * PHI, xy) * 0.5) * xy.x);
+        }
+        float map(float value, float min1, float max1, float min2, float max2) {
+            return min2 + (value - min1) * (max2 - min2) / (max1 - min1);
+        }
+
+        void main() {
+            vec2 st = fragCoord.xy;
+            ${center.includes("x")
+          ? "st.x -= abs(floor((mod(u_resolution.x, u_total_size) - u_dot_size) * 0.5));"
+          : ""
+        }
+            ${center.includes("y")
+          ? "st.y -= abs(floor((mod(u_resolution.y, u_total_size) - u_dot_size) * 0.5));"
+          : ""
+        }
+
+            float opacity = step(0.0, st.x);
+            opacity *= step(0.0, st.y);
+
+            vec2 st2 = vec2(int(st.x / u_total_size), int(st.y / u_total_size));
+
+            float frequency = 5.0;
+            float show_offset = random(st2);
+            float rand = random(st2 * floor((u_time / frequency) + show_offset + frequency));
+            opacity *= u_opacities[int(rand * 10.0)];
+            opacity *= 1.0 - step(u_dot_size / u_total_size, fract(st.x / u_total_size));
+            opacity *= 1.0 - step(u_dot_size / u_total_size, fract(st.y / u_total_size));
+
+            vec3 color = u_colors[int(show_offset * 6.0)];
+
+            float animation_speed_factor = 0.5;
+            vec2 center_grid = u_resolution / 2.0 / u_total_size;
+            float dist_from_center = distance(center_grid, st2);
+
+            float timing_offset_intro = dist_from_center * 0.01 + (random(st2) * 0.15);
+            float max_grid_dist = distance(center_grid, vec2(0.0, 0.0));
+            float timing_offset_outro = (max_grid_dist - dist_from_center) * 0.02 + (random(st2 + 42.0) * 0.2);
+
+            float current_timing_offset;
+            if (u_reverse == 1) {
+                current_timing_offset = timing_offset_outro;
+                 opacity *= 1.0 - step(current_timing_offset, u_time * animation_speed_factor);
+                 opacity *= clamp((step(current_timing_offset + 0.1, u_time * animation_speed_factor)) * 1.25, 1.0, 1.25);
+            } else {
+                current_timing_offset = timing_offset_intro;
+                 opacity *= step(current_timing_offset, u_time * animation_speed_factor);
+                 opacity *= clamp((1.0 - step(current_timing_offset + 0.1, u_time * animation_speed_factor)) * 1.25, 1.0, 1.25);
+            }
+
+            fragColor = vec4(color, opacity);
+            fragColor.rgb *= fragColor.a;
+        }`}
+      uniforms={uniforms}
+      maxFps={60}
+    />
+  );
+};
+
+const ShaderMaterial = ({
+  source,
+  uniforms,
+  maxFps = 60,
+}: {
+  source: string;
+  hovered?: boolean;
+  maxFps?: number;
+  uniforms: Uniforms;
+}) => {
+  const { size } = useThree();
+  const ref = useRef<THREE.Mesh>(null);
+
+  useFrame(({ clock }) => {
+    if (!ref.current) return;
+    const timestamp = clock.getElapsedTime();
+    const material: any = ref.current.material;
+    material.uniforms.u_time.value = timestamp;
+  });
+
+  const getUniforms = () => {
+    const preparedUniforms: any = {};
+    for (const uniformName in uniforms) {
+      const uniform: any = uniforms[uniformName];
+      switch (uniform.type) {
+        case "uniform1f":
+          preparedUniforms[uniformName] = { value: uniform.value };
+          break;
+        case "uniform1i":
+          preparedUniforms[uniformName] = { value: uniform.value };
+          break;
+        case "uniform3f":
+          preparedUniforms[uniformName] = { value: new THREE.Vector3().fromArray(uniform.value) };
+          break;
+        case "uniform1fv":
+          preparedUniforms[uniformName] = { value: uniform.value };
+          break;
+        case "uniform3fv":
+          preparedUniforms[uniformName] = {
+            value: uniform.value.map((v: number[]) => new THREE.Vector3().fromArray(v)),
+          };
+          break;
+        case "uniform2f":
+          preparedUniforms[uniformName] = { value: new THREE.Vector2().fromArray(uniform.value) };
+          break;
+        default:
+          console.error(`Invalid uniform type for '${uniformName}'.`);
+          break;
+      }
+    }
+
+    preparedUniforms["u_time"] = { value: 0 };
+    preparedUniforms["u_resolution"] = {
+      value: new THREE.Vector2(size.width * 2, size.height * 2),
+    };
+    return preparedUniforms;
+  };
+
+  const material = useMemo(() => {
+    return new THREE.ShaderMaterial({
+      vertexShader: `
+      precision mediump float;
+      in vec2 coordinates;
+      uniform vec2 u_resolution;
+      out vec2 fragCoord;
+      void main(){
+        float x = position.x;
+        float y = position.y;
+        gl_Position = vec4(x, y, 0.0, 1.0);
+        fragCoord = (position.xy + vec2(1.0)) * 0.5 * u_resolution;
+        fragCoord.y = u_resolution.y - fragCoord.y;
+      }
+      `,
+      fragmentShader: source,
+      uniforms: getUniforms(),
+      glslVersion: THREE.GLSL3,
+      blending: THREE.CustomBlending,
+      blendSrc: THREE.SrcAlphaFactor,
+      blendDst: THREE.OneFactor,
+      transparent: true,
+    });
+  }, [size.width, size.height, source, uniforms]);
+
+  return (
+    <mesh ref={ref}>
+      <planeGeometry args={[2, 2]} />
+      <primitive object={material} attach="material" />
+    </mesh>
+  );
+};
+
+const Shader: React.FC<ShaderProps> = ({ source, uniforms, maxFps = 60 }) => {
+  return (
+    <Canvas className="absolute inset-0 h-full w-full">
+      <ShaderMaterial source={source} uniforms={uniforms} maxFps={maxFps} />
+    </Canvas>
+  );
+};
+
+const AnimatedNavLink = ({ href, children }: { href: string; children: React.ReactNode }) => {
+  return (
+    <a href={href} className="group relative inline-block overflow-hidden h-5 flex items-center text-sm">
+      <div className="flex flex-col transition-transform duration-400 ease-out transform group-hover:translate-y-[-100%]">
+        <span className="text-gray-400 py-1">{children}</span>
+        <span className="text-white py-1">{children}</span>
+      </div>
+    </a>
+  );
+};
+
+function MiniNavbar() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [headerShapeClass, setHeaderShapeClass] = useState('rounded-full');
+  const shapeTimeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (shapeTimeoutRef.current) window.clearTimeout(shapeTimeoutRef.current);
+    if (isOpen) {
+      setHeaderShapeClass('rounded-2xl');
+    } else {
+      shapeTimeoutRef.current = window.setTimeout(() => setHeaderShapeClass('rounded-full'), 300);
+    }
+    return () => { if (shapeTimeoutRef.current) window.clearTimeout(shapeTimeoutRef.current); };
+  }, [isOpen]);
+
+  const navLinksData = [
+    { label: 'الرئيسية', href: '#' },
+    { label: 'خدماتنا', href: '#' },
+    { label: 'أعمالنا', href: '#' },
+    { label: 'اتصل بنا', href: '#' },
+  ];
+
+  return (
+    <header dir="rtl" className={`fixed top-6 left-1/2 transform -translate-x-1/2 z-50 flex flex-col items-center px-4 sm:px-6 py-2.5 backdrop-blur-xl ${headerShapeClass} border border-white/10 bg-black/40 w-[calc(100%-2rem)] sm:w-auto transition-all duration-500 ease-in-out shadow-[0_8px_32px_rgba(0,0,0,0.5)]`}>
+      <div className="flex items-center justify-between w-full gap-x-8 sm:gap-x-12">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-cyan-500 to-white flex items-center justify-center p-1.5 shadow-[0_0_15px_rgba(34,211,238,0.3)]">
+             <div className="w-full h-full rounded-full bg-black flex items-center justify-center text-[10px] font-bold text-white">M</div>
+          </div>
+          <span className="text-white font-bold tracking-tight hidden sm:block">Mavro Design</span>
+        </div>
+        
+        <nav className="hidden md:flex items-center space-x-reverse space-x-8 text-sm font-medium">
+          {navLinksData.map((link, i) => <AnimatedNavLink key={i} href={link.href}>{link.label}</AnimatedNavLink>)}
+        </nav>
+
+        <div className="hidden sm:flex items-center gap-4">
+          <GlowButton label="ابدأ الآن" className="px-6 py-2 text-xs h-9" icon={ArrowLeft} />
+        </div>
+
+        <button className="md:hidden flex items-center justify-center w-8 h-8 text-white focus:outline-none" onClick={() => setIsOpen(!isOpen)}>
+          <div className="space-y-1.5">
+            <motion.span animate={isOpen ? { rotate: 45, y: 5 } : { rotate: 0, y: 0 }} className="block w-5 h-0.5 bg-white rounded-full" />
+            <motion.span animate={isOpen ? { opacity: 0 } : { opacity: 1 }} className="block w-5 h-0.5 bg-white rounded-full" />
+            <motion.span animate={isOpen ? { rotate: -45, y: -5 } : { rotate: 0, y: 0 }} className="block w-5 h-0.5 bg-white rounded-full" />
+          </div>
+        </button>
+      </div>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div 
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="md:hidden w-full overflow-hidden"
+          >
+            <nav className="flex flex-col items-center space-y-5 py-6 text-lg font-medium">
+              {navLinksData.map((link, i) => (
+                <motion.a 
+                  key={i} 
+                  initial={{ x: 20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: i * 0.1 }}
+                  href={link.href} 
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
+                  {link.label}
+                </motion.a>
+              ))}
+              <GlowButton label="ابدأ الآن" className="w-full mt-4" icon={ArrowLeft} />
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </header>
+  );
+}
+
+const FloatingBadge = ({ text, icon: Icon, imageUrl, className, delay = 0, yOffset = 15 }: { text: string, icon?: any, imageUrl?: string, className: string, delay?: number, yOffset?: number }) => (
+  <motion.div 
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: [0, -yOffset, 0] }}
+    transition={{ 
+      opacity: { duration: 1, delay },
+      y: { duration: 4, repeat: Infinity, ease: 'easeInOut', delay }
+    }}
+    className={cn(
+      "absolute flex items-center gap-3 px-4 py-2.5 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-md shadow-[0_0_20px_rgba(0,0,0,0.3)] z-10",
+      className
+    )}
+  >
+    <div className="w-9 h-9 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex flex-shrink-0 items-center justify-center overflow-hidden drop-shadow-lg">
+       {imageUrl ? (
+         <img src={imageUrl} alt={text} className="w-6 h-6 object-contain" />
+       ) : (
+         Icon && <Icon size={14} className="text-cyan-400" />
+       )}
+    </div>
+    <span className="text-xs sm:text-sm font-semibold text-white/90">{text}</span>
+  </motion.div>
+);
+
+const VisualElement = () => {
+  return (
+    <div className="relative w-full h-[350px] lg:h-[500px] flex items-center justify-center pointer-events-none">
+      {/* Background Animated Orb */}
+      <motion.div
+        animate={{
+          scale: [1, 1.2, 1],
+          opacity: [0.3, 0.6, 0.3],
+          rotate: [0, 90, 0],
+        }}
+        transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+        className="absolute w-[300px] h-[300px] bg-cyan-500/20 rounded-full blur-[80px]"
+      />
+      
+      {/* The "NFC Card" Mockup */}
+      <motion.div
+        initial={{ rotateY: 20, rotateX: 10, y: 20, opacity: 0 }}
+        animate={{ 
+          rotateY: [20, 30, 20], 
+          rotateX: [10, 5, 10],
+          y: [0, -15, 0],
+          opacity: 1
+        }}
+        transition={{ 
+          duration: 6, 
+          repeat: Infinity, 
+          ease: "easeInOut",
+          opacity: { duration: 1 }
+        }}
+        style={{ transformStyle: "preserve-3d" }}
+        className="relative w-56 h-80 bg-gradient-to-br from-white/10 to-white/5 border border-white/20 rounded-2xl backdrop-blur-md shadow-2xl flex flex-col p-6 items-center justify-between"
+      >
+        <div className="w-full flex justify-between items-start">
+           <div className="w-10 h-10 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center">
+              <Cpu size={20} className="text-cyan-400" />
+           </div>
+           <div className="text-[10px] text-white/40 font-mono tracking-widest uppercase">NFC TECHNOLOGY</div>
+        </div>
+        
+        <div className="relative w-full flex flex-col items-center">
+            <div className="w-16 h-16 rounded-full bg-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.5)] mb-4 flex items-center justify-center overflow-hidden">
+                 <div className="w-full h-full bg-black/20 flex items-center justify-center text-white font-bold text-xl">M</div>
+            </div>
+            <div className="h-2 w-24 bg-white/20 rounded-full mb-2" />
+            <div className="h-2 w-16 bg-white/10 rounded-full" />
+        </div>
+
+        <div className="w-full space-y-3">
+          <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+             <motion.div animate={{ x: ['-100%', '100%'] }} transition={{ duration: 3, repeat: Infinity, ease: 'linear' }} className="w-1/2 h-full bg-cyan-400" />
+          </div>
+          <div className="flex justify-between items-end">
+            <div className="space-y-1">
+               <div className="h-1.5 w-12 bg-white/20 rounded-full" />
+               <div className="h-1.5 w-8 bg-white/10 rounded-full" />
+            </div>
+            <div className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center">
+               <Globe size={14} className="text-white/40" />
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Floating Badges */}
+      <FloatingBadge 
+        text="تقنية NFC ذكية" 
+        imageUrl="https://img.icons8.com/color/48/nfc-n.png"
+        className="top-10 -right-4 lg:-right-16" 
+        delay={0.5} 
+      />
+      
+      <FloatingBadge 
+        text="هوية بصرية احترافية" 
+        imageUrl="https://img.icons8.com/3d-fluency/94/color-palette.png"
+        className="bottom-16 -left-4 lg:-left-12" 
+        delay={1.5} 
+        yOffset={-15} 
+      />
+    </div>
+  );
+};
+
+const TrustPoint = ({ icon: Icon, text }: { icon: any, text: string }) => (
+  <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/5 backdrop-blur-sm">
+    <Icon size={14} className="text-cyan-400" />
+    <span className="text-[11px] sm:text-xs text-white/70 whitespace-nowrap">{text}</span>
+  </div>
+);
+
+export const SignInPage = ({ className }: { className?: string }) => {
+  return (
+    <div className={cn("flex w-full flex-col min-h-screen bg-[#020617] relative overflow-hidden", className)} dir="rtl">
+      {/* Dynamic Background */}
+      <div className="absolute inset-0 z-0">
+        <div
+          className="absolute inset-0 z-0"
+          style={{
+            backgroundImage: `radial-gradient(circle 800px at -10% 20%, rgba(6,182,212,0.15), transparent), 
+                              radial-gradient(circle 600px at 110% 80%, rgba(34,211,238,0.15), transparent)`,
+          }}
+        />
+        <div className="absolute inset-0 opacity-20">
+          <CanvasRevealEffect animationSpeed={2} containerClassName="bg-transparent" colors={[[34, 211, 238]]} dotSize={3} reverse={false} />
+        </div>
+      </div>
+
+      <MiniNavbar />
+
+      <main className="relative z-10 flex flex-1 items-center justify-center pt-20">
+        <div className="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          
+          {/* Content Column */}
+          <motion.div 
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1, ease: "easeOut" }}
+            className="flex flex-col items-center lg:items-start text-center lg:text-right space-y-10"
+          >
+            <div className="space-y-6">
+               <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold"
+                >
+                  <Sparkles size={14} />
+                  <span>حلول بصرية مبتكرة</span>
+                </motion.div>
+
+                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[4.5rem] font-bold leading-[1.3] lg:leading-[1.2]">
+                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-cyan-200 to-white/70 bg-[length:200%_auto] animate-shimmer inline-block drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+                      نحوّل هويتك إلى
+                   </span>
+                   <br />
+                   <span className="text-cyan-400 drop-shadow-[0_0_25px_rgba(34,211,238,0.4)]">تجربة بصرية ذكية</span>
+                </h1>
+
+                <p className="max-w-xl text-base sm:text-lg md:text-xl text-white/70 font-medium leading-[1.8] sm:leading-loose">
+                   رواد في صناعة الهويات البصرية القوية والحلول التقنية المتكاملة.
+                   <br className="hidden md:block" />
+                   نجمع بين الإبداع الفني وتقنية NFC لنعزز حضور علامتك التجارية في العالم الرقمي.
+                </p>
+            </div>
+
+            <div className="w-full flex flex-col sm:flex-row items-center gap-4 pt-2">
+              <GlowButton 
+                label="ابدأ مشروعك" 
+                className="w-full sm:w-auto min-w-[200px] h-14 text-lg font-bold" 
+                icon={ArrowLeft} 
+              />
+              <GlowButton 
+                label="شاهد أعمالنا" 
+                variant="secondary"
+                className="w-full sm:w-auto min-w-[200px] h-14 text-lg font-bold" 
+                icon={ArrowRight} 
+              />
+            </div>
+
+            {/* Trust Points */}
+            <div className="flex flex-wrap justify-center lg:justify-start gap-4 pt-4">
+               <TrustPoint icon={Palette} text="هوية بصرية احترافية" />
+               <TrustPoint icon={Cpu} text="حلول NFC ذكية" />
+               <TrustPoint icon={Globe} text="تجربة رقمية متكاملة" />
+            </div>
+
+            {/* Smaller Social Links */}
+            <div className="flex items-center gap-6 pt-6 border-t border-white/5 w-full justify-center lg:justify-start">
+               <span className="text-xs text-white/40 font-semibold">تواصل معنا:</span>
+               <a href="https://www.instagram.com/mavrodesign1/" target="_blank" className="text-white/40 hover:text-cyan-400 transition-colors">
+                  <Instagram size={20} />
+               </a>
+               <a href="mailto:mavrodesign1@outlook.com" className="text-white/40 hover:text-cyan-400 transition-colors">
+                  <Mail size={20} />
+               </a>
+            </div>
+          </motion.div>
+
+          {/* Visual Column */}
+          <motion.div
+             initial={{ opacity: 0, scale: 0.8 }}
+             animate={{ opacity: 1, scale: 1 }}
+             transition={{ duration: 1.2, ease: "easeOut", delay: 0.2 }}
+             className="relative z-0 mt-8 lg:mt-0"
+          >
+             <VisualElement />
+          </motion.div>
+        </div>
+      </main>
+
+      {/* Floating Bottom Element */}
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 opacity-20 hidden lg:block">
+         <motion.div animate={{ y: [0, 10, 0] }} transition={{ duration: 2, repeat: Infinity }}>
+            <div className="w-px h-12 bg-gradient-to-b from-cyan-400 to-transparent" />
+         </motion.div>
+      </div>
+    </div>
+  );
+};
