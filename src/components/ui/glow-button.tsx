@@ -25,7 +25,7 @@ export const GlowButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Comp
     const content = (
       <span className="flex items-center justify-center gap-1.5 relative z-10 transition-transform active:scale-95 duration-200">
         {label}
-        <Icon size={16} className="ml-0.5" />
+        <Icon size={16} className="ml-0.5 transition-transform duration-300 group-hover:translate-x-[-4px]" />
       </span>
     );
 

@@ -458,7 +458,7 @@ const VisualElement = () => {
           opacity: { duration: 1 }
         }}
         style={{ transformStyle: "preserve-3d" }}
-        className="relative w-48 h-72 sm:w-56 sm:h-80 bg-gradient-to-br from-white/10 to-white/5 border border-white/20 rounded-2xl backdrop-blur-md shadow-2xl flex flex-col p-6 items-center justify-between"
+        className="relative w-48 h-72 sm:w-56 sm:h-80 lg:w-64 lg:h-[24rem] bg-gradient-to-br from-white/10 to-white/5 border border-white/20 rounded-2xl backdrop-blur-md shadow-2xl flex flex-col p-6 items-center justify-between"
       >
         <div className="w-full flex justify-between items-start">
           <div className="w-10 h-10 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center">
@@ -495,16 +495,57 @@ const VisualElement = () => {
       <FloatingBadge
         text="تقنية NFC ذكية"
         imageUrl="https://img.icons8.com/color/48/nfc-n.png"
-        className="top-0 right-0 sm:top-10 sm:-right-4 lg:-right-16"
+        className="top-0 right-0 sm:top-10 sm:-right-4 lg:top-8 lg:right-4"
         delay={0.5}
       />
 
       <FloatingBadge
-        text="هوية بصرية احترافية"
+        text="هوية بصرية"
         imageUrl="https://img.icons8.com/3d-fluency/94/color-palette.png"
-        className="bottom-6 left-0 sm:bottom-16 sm:-left-4 lg:-left-12"
+        className="bottom-6 left-0 sm:bottom-16 sm:-left-4 lg:bottom-12 lg:left-4"
         delay={1.5}
         yOffset={-15}
+      />
+
+      {/* New Tool Badges */}
+      <FloatingBadge
+        text="هوية تجارية"
+        imageUrl="https://img.icons8.com/color-glass/48/adobe-photoshop.png"
+        className="top-12 left-0 sm:top-24 sm:-left-16 lg:top-28 lg:left-8"
+        delay={0.8}
+        yOffset={10}
+      />
+
+      <FloatingBadge
+        text="تصميم متكامل"
+        imageUrl="https://img.icons8.com/color-glass/48/adobe-illustrator.png"
+        className="bottom-0 right-0 sm:bottom-12 sm:-right-12 lg:bottom-8 lg:right-8"
+        delay={1.2}
+        yOffset={-12}
+      />
+
+      <FloatingBadge
+        text="موشن جرافيك"
+        imageUrl="https://img.icons8.com/fluency/48/adobe-after-effects.png"
+        className="-top-8 left-4 sm:top-4 sm:left-24 lg:-top-12 lg:left-32"
+        delay={2}
+        yOffset={18}
+      />
+
+      <FloatingBadge
+        text="تحرير فيديو"
+        imageUrl="https://img.icons8.com/fluency/48/adobe-premiere-pro.png"
+        className="bottom-12 right-0 sm:bottom-auto sm:top-1/2 sm:-right-24 lg:top-1/2 lg:right-4"
+        delay={1.8}
+        yOffset={-10}
+      />
+
+      <FloatingBadge
+        text="واجهات ذكية"
+        imageUrl="https://img.icons8.com/external-tal-revivo-color-tal-revivo/24/external-figma-a-better-way-to-design-and-gather-feedback-all-in-one-place-logo-color-tal-revivo.png"
+        className="top-[45%] left-2 sm:top-[70%] sm:-left-24 lg:top-[65%] lg:left-4"
+        delay={0.3}
+        yOffset={15}
       />
     </div>
   );
@@ -536,8 +577,8 @@ export const SignInPage = ({ className }: { className?: string }) => {
 
       <MiniNavbar />
 
-      <main className="relative z-10 flex flex-1 items-start md:items-center justify-center min-h-[100svh] pt-24 sm:pt-40 md:pt-20 lg:pt-0 pb-10">
-        <div className="container mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16 items-start md:items-center w-full">
+      <main className="relative z-10 flex flex-1 items-start md:items-center justify-center min-h-[100svh] pt-32 sm:pt-48 md:pt-32 lg:pt-20 pb-10">
+        <div className="container max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-20 items-start md:items-center w-full">
 
           {/* Content Column */}
           <motion.div
@@ -564,9 +605,9 @@ export const SignInPage = ({ className }: { className?: string }) => {
                 <span className="text-cyan-400 drop-shadow-[0_0_25px_rgba(34,211,238,0.4)]">تجربة بصرية ذكية</span>
               </h1>
 
-              <p className="max-w-xl text-base sm:text-lg md:text-xl text-white/70 font-medium leading-[1.8] sm:leading-loose px-4 sm:px-0">
+              <p className="max-w-xl text-base sm:text-lg md:text-xl text-white/70 font-medium leading-[1.8] sm:leading-loose px-4 sm:px-0 lg:leading-relaxed">
                 رواد في صناعة الهويات البصرية القوية والحلول التقنية المتكاملة.
-                <br className="hidden md:block" />
+                <br className="hidden lg:block" />
                 نجمع بين الإبداع الفني وتقنية NFC لنعزز حضور علامتك التجارية في العالم الرقمي.
               </p>
             </div>
@@ -574,13 +615,14 @@ export const SignInPage = ({ className }: { className?: string }) => {
             <div className="w-full flex flex-col sm:flex-row items-center gap-4 pt-2">
               <GlowButton
                 label="ابدأ مشروعك"
-                className="w-full sm:w-auto min-w-[200px] h-14 text-lg font-bold"
+                className="w-full sm:w-auto min-w-[200px] h-14 text-lg font-bold group"
                 icon={ArrowLeft}
+                href="https://www.instagram.com/mavrodesign1/"
               />
               <GlowButton
                 label="شاهد أعمالنا"
                 variant="secondary"
-                className="w-full sm:w-auto min-w-[200px] h-14 text-lg font-bold"
+                className="w-full sm:w-auto min-w-[200px] h-14 text-lg font-bold group"
                 icon={ArrowRight}
               />
             </div>
