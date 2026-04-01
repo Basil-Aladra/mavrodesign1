@@ -27,7 +27,6 @@ interface ShaderProps {
       type: string;
     };
   };
-  maxFps?: number;
 }
 
 export const CanvasRevealEffect = ({
@@ -215,7 +214,6 @@ const DotMatrix: React.FC<DotMatrixProps> = ({
             fragColor.rgb *= fragColor.a;
         }`}
       uniforms={uniforms}
-      maxFps={60}
     />
   );
 };
@@ -308,7 +306,7 @@ const ShaderMaterial = ({
   );
 };
 
-const Shader: React.FC<ShaderProps> = ({ source, uniforms, maxFps = 60 }) => {
+const Shader: React.FC<ShaderProps> = ({ source, uniforms }) => {
   return (
     <Canvas className="absolute inset-0 h-full w-full">
       <ShaderMaterial source={source} uniforms={uniforms} />
@@ -408,27 +406,27 @@ function MiniNavbar() {
 
 const FloatingBadge = ({ text, icon: Icon, imageUrl, className, delay = 0, yOffset = 15 }: { text: string, icon?: any, imageUrl?: string, className: string, delay?: number, yOffset?: number }) => {
   return (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: [0, -yOffset, 0] }}
-    transition={{
-      opacity: { duration: 1, delay },
-      y: { duration: 4, repeat: Infinity, ease: 'easeInOut', delay }
-    }}
-    className={cn(
-      "absolute flex items-center gap-2 sm:gap-3 px-3 py-2 sm:px-4 sm:py-2.5 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-md shadow-[0_0_20px_rgba(0,0,0,0.3)] z-10 origin-center scale-[0.8] sm:scale-90 lg:scale-100",
-      className
-    )}
-  >
-    <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex flex-shrink-0 items-center justify-center overflow-hidden drop-shadow-lg">
-      {imageUrl ? (
-        <img src={imageUrl} alt={text} className="w-5 h-5 sm:w-6 sm:h-6 object-contain" />
-      ) : (
-        Icon && <Icon size={14} className="text-cyan-400" />
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: [0, -yOffset, 0] }}
+      transition={{
+        opacity: { duration: 1, delay },
+        y: { duration: 4, repeat: Infinity, ease: 'easeInOut', delay }
+      }}
+      className={cn(
+        "absolute flex items-center gap-2 sm:gap-3 px-3 py-2 sm:px-4 sm:py-2.5 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-md shadow-[0_0_20px_rgba(0,0,0,0.3)] z-10 origin-center scale-[0.8] sm:scale-90 lg:scale-100",
+        className
       )}
-    </div>
-    <span className="text-[11px] sm:text-sm font-semibold text-white/90 whitespace-nowrap">{text}</span>
-  </motion.div>
+    >
+      <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex flex-shrink-0 items-center justify-center overflow-hidden drop-shadow-lg">
+        {imageUrl ? (
+          <img src={imageUrl} alt={text} className="w-5 h-5 sm:w-6 sm:h-6 object-contain" />
+        ) : (
+          Icon && <Icon size={14} className="text-cyan-400" />
+        )}
+      </div>
+      <span className="text-[11px] sm:text-sm font-semibold text-white/90 whitespace-nowrap">{text}</span>
+    </motion.div>
   );
 };
 
@@ -447,54 +445,59 @@ const VisualElement = () => {
         className="absolute w-[300px] h-[300px] bg-cyan-500/20 rounded-full blur-[80px]"
       />
 
-      {/* The "NFC Card" Mockup */}
-      <motion.div
-        initial={{ rotateY: 20, rotateX: 10, y: 20, opacity: 0 }}
-        animate={{
-          rotateY: [20, 30, 20],
-          rotateX: [10, 5, 10],
-          y: [0, -15, 0],
-          opacity: 1
-        }}
-        transition={{
-          duration: 6,
-          repeat: Infinity,
-          ease: "easeInOut",
-          opacity: { duration: 1 }
-        }}
-        style={{ transformStyle: "preserve-3d" }}
-        className="relative w-48 h-72 sm:w-56 sm:h-80 lg:w-64 lg:h-[24rem] bg-gradient-to-br from-white/10 to-white/5 border border-white/20 rounded-2xl backdrop-blur-md shadow-2xl flex flex-col p-6 items-center justify-between"
-      >
-        <div className="w-full flex justify-between items-start">
-          <div className="w-10 h-10 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center">
-            <Cpu size={20} className="text-cyan-400" />
-          </div>
-          <div className="text-[10px] text-white/40 font-mono tracking-widest uppercase">NFC TECHNOLOGY</div>
-        </div>
+      {/* The Real NFC Card Image + NFC Ripple Effect */}
+      <div className="relative flex items-center justify-center">
+        {/* NFC Ripple Rings */}
+        {[0, 1, 2, 3].map((i) => (
+          <motion.div
+            key={i}
+            className="absolute rounded-full border border-cyan-400/30"
+            style={{ width: 120 + i * 70, height: 120 + i * 70 }}
+            animate={{
+              scale: [1, 1.35, 1],
+              opacity: [0.5, 0, 0.5],
+            }}
+            transition={{
+              duration: 2.5,
+              repeat: Infinity,
+              ease: "easeOut",
+              delay: i * 0.55,
+            }}
+          />
+        ))}
 
-        <div className="relative w-full flex flex-col items-center">
-          <div className="w-16 h-16 rounded-full bg-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.5)] mb-4 flex items-center justify-center overflow-hidden">
-            <div className="w-full h-full bg-black/20 flex items-center justify-center text-white font-bold text-xl">M</div>
-          </div>
-          <div className="h-2 w-24 bg-white/20 rounded-full mb-2" />
-          <div className="h-2 w-16 bg-white/10 rounded-full" />
-        </div>
+        {/* Solid center glow */}
+        <motion.div
+          className="absolute w-16 h-16 rounded-full bg-cyan-400/10 blur-xl"
+          animate={{ scale: [1, 1.5, 1], opacity: [0.4, 0.8, 0.4] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        />
 
-        <div className="w-full space-y-3">
-          <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-            <motion.div animate={{ x: ['-100%', '100%'] }} transition={{ duration: 3, repeat: Infinity, ease: 'linear' }} className="w-1/2 h-full bg-cyan-400" />
-          </div>
-          <div className="flex justify-between items-end">
-            <div className="space-y-1">
-              <div className="h-1.5 w-12 bg-white/20 rounded-full" />
-              <div className="h-1.5 w-8 bg-white/10 rounded-full" />
-            </div>
-            <div className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center">
-              <Globe size={14} className="text-white/40" />
-            </div>
-          </div>
-        </div>
-      </motion.div>
+        {/* Floating Card */}
+        <motion.div
+          initial={{ y: 20, opacity: 0, rotateY: -5 }}
+          animate={{
+            y: [0, -18, 0],
+            opacity: 1,
+            rotateY: [-5, 5, -5],
+            rotateX: [3, -3, 3],
+          }}
+          transition={{
+            duration: 7,
+            repeat: Infinity,
+            ease: "easeInOut",
+            opacity: { duration: 1.2 }
+          }}
+          style={{ transformStyle: "preserve-3d", perspective: "1000px" }}
+          className="relative z-10 drop-shadow-[0_30px_60px_rgba(34,211,238,0.3)]"
+        >
+          <img
+            src="/mavrodesign1/card.png"
+            alt="Mavro Design NFC Card"
+            className="w-40 sm:w-64 lg:w-64 object-contain rounded-2xl"
+          />
+        </motion.div>
+      </div>
 
       {/* Floating Badges */}
       <FloatingBadge
@@ -565,6 +568,39 @@ const TrustPoint = ({ icon: Icon, text }: { icon: any, text: string }) => {
   );
 };
 
+const RotatingText = ({ words }: { words: string[] }) => {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    if (!Array.isArray(words) || words.length === 0) return;
+    const interval = setInterval(() => {
+      setIndex((prevIndex) => (prevIndex + 1) % words.length);
+    }, 3000); 
+    return () => clearInterval(interval);
+  }, [words]);
+
+  if (!Array.isArray(words) || words.length === 0) {
+    return <span className="text-cyan-400 drop-shadow-[0_0_25px_rgba(34,211,238,0.4)]">{words}</span>;
+  }
+
+  return (
+    <span className="inline-grid [grid-template-areas:'content'] pb-6 pt-2 -mb-6 -mt-2 px-1 -mx-1 overflow-hidden">
+      <AnimatePresence mode="popLayout">
+        <motion.span
+          key={index}
+          initial={{ y: 30, opacity: 0, filter: "blur(5px)" }}
+          animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
+          exit={{ y: -30, opacity: 0, filter: "blur(5px)", position: "absolute" }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="[grid-area:content] text-cyan-400 drop-shadow-[0_0_25px_rgba(34,211,238,0.4)]"
+        >
+          {words[index]}
+        </motion.span>
+      </AnimatePresence>
+    </span>
+  );
+};
+
 export const LandingPage = ({ className }: { className?: string }) => {
   const { t, i18n } = useTranslation();
   const dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
@@ -585,9 +621,9 @@ export const LandingPage = ({ className }: { className?: string }) => {
 
   return (
     <div className={cn("flex w-full flex-col min-h-[100svh] bg-[#020617] relative overflow-x-hidden", className)} dir={dir}>
-      <LanguageModal 
-        isOpen={showLanguageModal} 
-        onSelect={handleLanguageSelect} 
+      <LanguageModal
+        isOpen={showLanguageModal}
+        onSelect={handleLanguageSelect}
       />
       {/* Dynamic Background */}
       <div className="absolute inset-0 z-0">
@@ -633,9 +669,7 @@ export const LandingPage = ({ className }: { className?: string }) => {
                   {t('hero.titleMain')}
                 </span>
                 <br />
-                <span className="text-cyan-400 drop-shadow-[0_0_25px_rgba(34,211,238,0.4)]">
-                  {t('hero.titleHighlight')}
-                </span>
+                <RotatingText words={t('hero.titleHighlight', { returnObjects: true }) as string[]} />
               </h1>
 
               <p className="max-w-xl text-base sm:text-lg md:text-xl text-white/70 font-medium leading-[1.8] sm:leading-loose px-4 sm:px-0 lg:leading-relaxed">

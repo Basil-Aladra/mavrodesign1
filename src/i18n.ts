@@ -17,7 +17,11 @@ const resources = {
         digitalSolutions: "حلول رقمية",
         innovative: "حلول رقمية مبتكرة",
         titleMain: "تصميم يجمع بين الإبداع البصري",
-        titleHighlight: "والذكاء التقني",
+        titleHighlight: [
+          "والذكاء التقني",
+          "والتصميم العصري",
+          "والحلول المبتكرة"
+        ],
         description: "نحن في Mavro Design نحول الأفكار إلى هويات بصرية ملموسة وتجارب رقمية ذكية تضعك في الصدارة.",
         buttons: {
           start: "ابدأ مشروعك",
@@ -90,7 +94,11 @@ const resources = {
         digitalSolutions: "Digital Solutions",
         innovative: "Innovative",
         titleMain: "Design combining visual creativity",
-        titleHighlight: "and technical intelligence",
+        titleHighlight: [
+          "and technical intelligence",
+          "and modern design",
+          "and innovative solutions"
+        ],
         description: "At Mavro Design, we transform ideas into tangible visual identities and smart digital experiences that put you ahead.",
         buttons: {
           start: "Start Project",
