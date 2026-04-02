@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useTranslation } from "react-i18next";
+
 import { Globe, ArrowRight, ArrowLeft } from "lucide-react";
 
 interface LanguageModalProps {

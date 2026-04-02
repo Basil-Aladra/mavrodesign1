@@ -7,10 +7,6 @@ export const LanguageSwitcher = ({ className }: { className?: string }) => {
   const { i18n } = useTranslation();
   const currentLang = i18n.language || 'ar';
 
-  const toggleLanguage = () => {
-    const nextLang = currentLang === 'ar' ? 'en' : 'ar';
-    i18n.changeLanguage(nextLang);
-  };
 
   useEffect(() => {
     const dir = currentLang === 'ar' ? 'rtl' : 'ltr';

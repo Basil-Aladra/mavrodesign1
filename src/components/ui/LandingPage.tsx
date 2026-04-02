@@ -10,7 +10,7 @@ import { ContactSection } from "./contact-section";
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "./language-switcher";
 import { LanguageModal } from "./language-modal";
-
+import cardImg from "@/assets/card.png";
 
 type Uniforms = {
   [key: string]: {
@@ -491,11 +491,13 @@ const VisualElement = () => {
           style={{ transformStyle: "preserve-3d", perspective: "1000px" }}
           className="relative z-10 drop-shadow-[0_30px_60px_rgba(34,211,238,0.3)]"
         >
-          <img
-            src="/mavrodesign1/card.png"
-            alt="Mavro Design NFC Card"
-            className="w-40 sm:w-64 lg:w-64 object-contain rounded-2xl"
-          />
+          <div className="flex items-center justify-center w-40 h-[15rem] sm:w-52 sm:h-[19.5rem] lg:w-[17rem] lg:h-[26rem]">
+            <img
+              src={cardImg}
+              alt="Mavro Design NFC Card"
+              className="min-w-[15rem] sm:min-w-[19.5rem] lg:min-w-[26rem] object-contain rounded-2xl -rotate-90"
+            />
+          </div>
         </motion.div>
       </div>
 
@@ -575,7 +577,7 @@ const RotatingText = ({ words }: { words: string[] }) => {
     if (!Array.isArray(words) || words.length === 0) return;
     const interval = setInterval(() => {
       setIndex((prevIndex) => (prevIndex + 1) % words.length);
-    }, 3000); 
+    }, 3000);
     return () => clearInterval(interval);
   }, [words]);
 
